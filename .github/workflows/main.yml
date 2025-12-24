@@ -1,4 +1,4 @@
-name: Cloudflare Free RDP 12H
+name: Cloudflare RDP Pro 12H
 
 on:
   workflow_dispatch:
@@ -9,10 +9,10 @@ jobs:
     timeout-minutes: 720
 
     steps:
-    - name: Enable RDP
+    - name: Create RDP User
       run: |
-        net user runneradmin P@ssw0rd123
-        net localgroup administrators runneradmin /add
+        net user trader Pro@123456 /add
+        net localgroup administrators trader /add
         reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
@@ -20,6 +20,20 @@ jobs:
       run: |
         Invoke-WebRequest https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe -OutFile cloudflared.exe
 
-    - name: Start Cloudflare Tunnel (FREE)
+    - name: Install Cloudflare WARP
       run: |
-        ./cloudflared.exe tunnel --url tcp://localhost:3389
+        Invoke-WebRequest https://1111-releases.cloudflareclient.com/windows/Cloudflare_WARP_Release-x64.msi -OutFile warp.msi
+        Start-Process msiexec.exe -ArgumentList "/i warp.msi /quiet /norestart" -Wait
+
+    - name: Install MT5
+      run: |
+        Invoke-WebRequest https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe -OutFile mt5.exe
+        Start-Process mt5.exe -ArgumentList "/silent" -Wait
+
+    - name: Start Cloudflare Tunnel (Auto Reconnect)
+      shell: powershell
+      run: |
+        while ($true) {
+          .\cloudflared.exe tunnel --url tcp://localhost:3389
+          Start-Sleep -Seconds 5
+        }
