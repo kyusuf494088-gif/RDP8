@@ -25,11 +25,7 @@ jobs:
         Invoke-WebRequest https://1111-releases.cloudflareclient.com/windows/Cloudflare_WARP_Release-x64.msi -OutFile warp.msi
         Start-Process msiexec.exe -ArgumentList "/i warp.msi /quiet /norestart" -Wait
 
-    - name: Install MT5
-      run: |
-        Invoke-WebRequest https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe -OutFile mt5.exe
-        Start-Process mt5.exe -ArgumentList "/silent" -Wait
-
+   
     - name: Start Cloudflare Tunnel (Auto Reconnect)
       shell: powershell
       run: |
