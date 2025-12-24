@@ -25,11 +25,8 @@ jobs:
         Invoke-WebRequest https://1111-releases.cloudflareclient.com/windows/Cloudflare_WARP_Release-x64.msi -OutFile warp.msi
         Start-Process msiexec.exe -ArgumentList "/i warp.msi /quiet /norestart" -Wait
 
-   
-    - name: Start Cloudflare Tunnel (Auto Reconnect)
-      shell: powershell
-      run: |
-        while ($true) {
-          .\cloudflared.exe tunnel --url tcp://localhost:3389
-          Start-Sleep -Seconds 5
-        }
+- name: Start Cloudflare Tunnel (SHOW PORT)
+  shell: powershell
+  run: |
+    .\cloudflared.exe tunnel --url tcp://localhost:3389 --loglevel debug
+
